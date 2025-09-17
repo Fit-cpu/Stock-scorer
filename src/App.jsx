@@ -1,6 +1,39 @@
 import React, { useState } from 'react';
 
 
+// Normalization functions to map raw metrics to 0-1 scale
+const normalize = {
+debtToEquity: x => Math.max(0, Math.min(1, (2 - x) / 2)),
+currentRatio: x => Math.min(1, x / 2),
+fcfYield: x => Math.min(1, x / 20),
+
+
+grossMargin: x => Math.min(1, x / 50),
+opMargin: x => Math.min(1, x / 40),
+roic: x => Math.min(1, x / 20),
+
+
+revGrowth: x => Math.min(1, x / 30),
+epsGrowth: x => Math.min(1, x / 30),
+
+
+forwardPE: x => Math.max(0, Math.min(1, (40 - x) / 40)),
+peg: x => Math.max(0, Math.min(1, (2 - x) / 2)),
+priceToFcf: x => Math.max(0, Math.min(1, (30 - x) / 30)),
+
+
+oneToFive: x => (x - 1) / 4,
+customerConcentration: x => (5 - x) / 4
+};
+
+
+// Demo fallback metrics for testing
+const DEMO_VALUES = {
+debtToEquity: 0.22,
+currentRatio: 2.37,
+fcfYield: 2.87,
+
+
 grossMargin: 58.58,
 opMargin: 48.77,
 roic: 19.79,
@@ -40,47 +73,4 @@ export default function StockBuyScoreApp() {
 const [ticker, setTicker] = useState('');
 const [values, setValues] = useState(null);
 const [score, setScore] = useState(null);
-
-
-const handleSearch = () => {
-const fetchedValues = { ...DEMO_VALUES };
-setValues(fetchedValues);
-const computed = computeScore(fetchedValues);
-setScore(computed);
-};
-
-
-return (
-<div className="max-w-3xl mx-auto p-6 font-sans">
-<h1 className="text-3xl font-bold mb-4">Stock Buy Score</h1>
-<p className="mb-6 text-gray-600">Enter a stock ticker to calculate its Buy Score (0-100).</p>
-<div className="flex mb-6">
-<input
-type="text"
-placeholder="Ticker e.g. TSM"
-className="flex-1 border rounded-l px-3 py-2"
-value={ticker}
-onChange={e => setTicker(e.target.value.toUpperCase())}
-/>
-<button className="bg-blue-600 text-white px-4 rounded-r" onClick={handleSearch}>Search</button>
-</div>
-
-
-{score && (
-<div className="bg-gray-50 p-6 rounded shadow">
-<h2 className="text-2xl font-semibold mb-4">{ticker} Buy Score: {score.finalScore.toFixed(1)}/100</h2>
-<ul className="space-y-1">
-<li>Financial Strength: {(score.financial*100).toFixed(1)}</li>
-<li>Profitability: {(score.profitability*100).toFixed(1)}</li>
-<li>Growth: {(score.growth*100).toFixed(1)}</li>
-<li>Valuation: {(score.valuation*100).toFixed(1)}</li>
-<li>Market & Competitive: {(score.market*100).toFixed(1)}</li>
-</ul>
-</div>
-)}
-
-
-{!score && <p className="text-gray-500">Enter a ticker and click Search to see the Buy Score.</p>}
-</div>
-);
 }
